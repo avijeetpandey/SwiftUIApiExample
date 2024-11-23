@@ -22,6 +22,7 @@ struct Joke: Codable {
     let setup: String?
     let delivery: String?
     let joke: String?
+    let id: Int
     
     // coding keys
     private enum CodingKeys: String, CodingKey {
@@ -30,5 +31,6 @@ struct Joke: Codable {
         case setup
         case delivery
         case joke
+        case id
     }
 }
