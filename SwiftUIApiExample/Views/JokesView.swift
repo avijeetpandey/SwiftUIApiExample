@@ -8,19 +8,17 @@
 import SwiftUI
 
 struct JokesView: View {
-    @State var jokes: [Joke] = []
-    @State var isLoading: Bool = false
-    @State var errorMessage: String?
+    @StateObject var viewModel = JokeViewModel()
     
     var body: some View {
-        if let errorMessage = errorMessage {
+        if let errorMessage = viewModel.errorMessage {
             Text("Oops something went wrong \(errorMessage)")
         }
         
-        if isLoading {
+        if viewModel.isLoading {
             ProgressView()
-        } else {
-            List(jokes, id: \.id) { joke in
+        } else if !viewModel.isLoading {
+            List(viewModel.jokes, id: \.id) { joke in
                 if joke.type == "single" {
                     SingleJokeView(joke: joke.joke ?? "")
                 } else {
@@ -31,14 +29,8 @@ struct JokesView: View {
         }
         
         Button("Fetch Jokes") {
-            isLoading.toggle()
             Task {
-                do {
-                    jokes = try await JokesService.shared.fetchJokes()
-                    isLoading.toggle()
-                } catch {
-                    errorMessage = error.localizedDescription
-                }
+                try await viewModel.fetchJokes()
             }
         }
     }
